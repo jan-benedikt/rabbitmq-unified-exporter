@@ -1,0 +1,50 @@
+[
+  {
+    "name": "q1",
+    "vhost": "/",
+    "node": "rabbit@n1",
+    "type": "classic",
+    "state": "running",
+    "messages": 7,
+    "messages_ready": 5,
+    "messages_unacknowledged": 2,
+    "consumers": 1,
+    "memory": 4096,
+    "message_bytes_ram": 2048,
+    "message_stats": {"deliver_get": 100, "redeliver": 2, "publish": 110}
+  },
+  {
+    "name": "qq1",
+    "vhost": "/",
+    "node": "rabbit@n1",
+    "type": "quorum",
+    "state": "running",
+    "leader": "rabbit@n1",
+    "members": ["rabbit@n1", "rabbit@n2", "rabbit@n3"],
+    "online": ["rabbit@n1", "rabbit@n2"],
+    "messages": 0,
+    "messages_ready": 0,
+    "messages_unacknowledged": 0,
+    "consumers": 0,
+    "memory": 8192
+  },
+  {
+    "name": "other-node-q",
+    "vhost": "/",
+    "node": "rabbit@n2",
+    "type": "classic",
+    "messages_ready": 99,
+    "messages": 99,
+    "messages_unacknowledged": 0,
+    "consumers": 0,
+    "memory": 1024
+  },
+  {
+    "name": "null-ready",
+    "vhost": "/",
+    "node": "rabbit@n1",
+    "type": "classic",
+    "messages_ready": null,
+    "messages": null
+  }
+]

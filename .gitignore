@@ -21,12 +21,32 @@ profile.cov
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# Build output
+bin/
+/rabbitmq-unified-exporter
+*.exe
+
 # Go workspace file
 go.work
 go.work.sum
 
 # env file
 .env
+
+# Local / environment-specific (not for git)
+ignore/
+
+#Archives
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.lzma
+*.tar.lz
+*.tar.lz4
+*.tar.zstd
+*.tgz
 
 # Editor/IDE
 # .idea/

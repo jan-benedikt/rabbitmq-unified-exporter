@@ -1,0 +1,230 @@
+# Migrated subset of alerts.yaml for rabbitmq-unified-exporter.
+# Full original Grafana export remains at ../alerts.yaml.
+# Key change: scrape availability uses rabbitmq_unified_exporter_target_up / collection_success
+# instead of Prometheus scrape `up` (which now only reflects the exporter process).
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: Availability and alarms
+    folder: RabbitMQ
+    interval: 30s
+    rules:
+      - uid: bfmt4z5nvdddsc
+        title: RabbitMQ memory alarm is active
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_alarms_memory_used_watermark{job=~"rabbitmq.*"})
+              instant: true
+              refId: A
+        for: 1m
+        labels:
+          severity: critical
+          service: rabbitmq
+
+      - uid: ffmt54yhu9qf4a
+        title: RabbitMQ disk alarm is active
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_alarms_free_disk_space_watermark{job=~"rabbitmq.*"})
+              instant: true
+              refId: A
+        for: 1m
+        labels:
+          severity: critical
+          service: rabbitmq
+
+      - uid: efmt5a8ib7j7kf
+        title: RabbitMQ file descriptor alarm is active
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_alarms_file_descriptor_limit{job=~"rabbitmq.*"})
+              instant: true
+              refId: A
+        for: 1m
+        labels:
+          severity: critical
+          service: rabbitmq
+
+      - uid: rmq-scrape-down
+        title: RabbitMQ metrics target is unavailable
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              # Was: min by (...) (up{job=~"rabbitmq.*"})
+              expr: min by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_unified_exporter_target_up{source="prometheus"})
+              instant: true
+              refId: A
+        for: 2m
+        labels:
+          severity: critical
+          service: rabbitmq
+
+      - uid: rmq-targets-missing
+        title: RabbitMQ scrape targets are missing
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              # Was: absent(up{job=~"rabbitmq.*"})
+              expr: absent(rabbitmq_expected_target{job=~"rabbitmq.*"}) or vector(0)
+              instant: true
+              refId: A
+        for: 5m
+        labels:
+          severity: warning
+          service: rabbitmq
+
+      - uid: rmq-exporter-process-down
+        title: RabbitMQ unified exporter process is down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: min by (job, instance) (up{job=~"rabbitmq-unified.*"})
+              instant: true
+              refId: A
+        for: 2m
+        labels:
+          severity: critical
+          service: rabbitmq
+
+  - orgId: 1
+    name: PRD - Delivery reliability
+    folder: RabbitMQ
+    interval: 30s
+    rules:
+      - uid: rmq-unroutable-dropped
+        title: '[PRD] RabbitMQ unroutable messages dropped'
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: sum by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, exchange) (increase(rabbitmq_channel_messages_unroutable_dropped_total{job=~"rabbitmq.*", environment="prd"}[5m]))
+              instant: true
+              refId: A
+        for: 5m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          limitation: Requires Prometheus mode; unsupported in JSON mode (see docs/metric-compatibility.md).
+
+      - uid: afwivam51jzlsb
+        title: '[PRD] RabbitMQ high redelivery ratio'
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: sum by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rate(rabbitmq_global_messages_redelivered_total{job=~"rabbitmq.*", environment="prd"}[5m]))
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: sum by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rate(rabbitmq_global_messages_delivered_total{job=~"rabbitmq.*", environment="prd"}[5m]))
+              instant: true
+              refId: B
+        for: 10m
+        labels:
+          severity: warning
+          service: rabbitmq
+
+  - orgId: 1
+    name: Quorum and Raft
+    folder: RabbitMQ
+    interval: 30s
+    rules:
+      - uid: ffwivi4tsxpmoa
+        title: RabbitMQ high Raft commit latency
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) (rabbitmq_raft_entry_commit_latency_seconds{job=~"rabbitmq.*"})
+              instant: true
+              refId: A
+        for: 5m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          limitation: Requires Prometheus detailed ra_metrics; unsupported in JSON mode.
+
+  - orgId: 1
+    name: Resource capacity
+    folder: RabbitMQ
+    interval: 30s
+    rules:
+      - uid: bfwiul88ey2o0d
+        title: RabbitMQ file descriptor usage high
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_process_open_fds{job=~"rabbitmq.*"})
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_process_max_fds{job=~"rabbitmq.*"})
+              instant: true
+              refId: B
+        for: 10m
+        labels:
+          severity: warning
+          service: rabbitmq
+
+      - uid: rmq-disk-headroom
+        title: RabbitMQ disk is approaching watermark
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_disk_space_available_bytes{job=~"rabbitmq.*"})
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: PROMETHEUS_DS
+            model:
+              expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_disk_space_available_limit_bytes{job=~"rabbitmq.*"})
+              instant: true
+              refId: B
+        for: 10m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          note: If native sample is unknown, rely on JSON/management disk_free or sanitizer + management dual collection.

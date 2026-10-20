@@ -1,0 +1,193 @@
+# Use replicaCount=1, or one Helm release per shard with unique config.sharding.shard_index.
+replicaCount: 1
+
+image:
+  repository: ghcr.io/jan-benedikt/rabbitmq-unified-exporter
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+podAnnotations: {}
+
+terminationGracePeriodSeconds: 30
+
+priorityClassName: ""
+topologySpreadConstraints: []
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+service:
+  type: ClusterIP
+  port: 9419
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+extraEnv: []
+extraEnvFrom: []
+extraVolumes: []
+extraVolumeMounts: []
+
+startupProbe:
+  httpGet:
+    path: /readyz
+    port: http
+  failureThreshold: 30
+  periodSeconds: 2
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# ConfigMap contents (exporter YAML). Override in production.
+config: |
+  server:
+    listen_address: ":9419"
+    metrics_path: /metrics
+    enable_probe: false
+    enable_diagnostics: false
+  defaults:
+    scrape_interval: 15s
+    scrape_timeout: 14s
+    max_concurrency: 10
+    sanitize:
+      enabled: true
+      invalid_values: [unknown, undefined, null]
+      strategy: drop_sample
+  groups: []
+
+# Existing secrets mounted as files for username_file / password_file.
+existingSecrets: []
+# - name: rabbitmq-prod-creds
+#   mountPath: /secrets/prod
+
+# External Secrets Operator (optional)
+externalSecret:
+  enabled: false
+  refreshInterval: 1h
+  mountPath: /secrets/external
+  secretStoreRef:
+    name: ""
+    kind: ClusterSecretStore
+  target:
+    name: ""
+  data: []
+  # - secretKey: password
+  #   remoteKey: rabbitmq/prod
+  #   property: password
+
+serviceMonitor:
+  enabled: false
+  honorLabels: true
+  # false avoids Prometheus honoring proxied RabbitMQ timestamps from last-good cache.
+  honorTimestamps: false
+  scrapeClass: ""
+  fallbackScrapeProtocol: ""
+  # Prometheus requires scrapeTimeout < interval.
+  # Large per-object RabbitMQ payloads need headroom; exporter also serves gzip.
+  interval: 60s
+  scrapeTimeout: 50s
+  metricRelabelings: []
+  relabelings: []
+  sampleLimit: null
+  labelLimit: null
+  tlsConfig: {}
+  basicAuth: {}
+  labels: {}
+  # Auto-generate one scrape per config target (and per source) from Values.config.
+  splitByTarget: true
+  splitBySource: true   # /prometheus + /management (+ /probes when enabled)
+  scrapeSelf: true      # /metrics/self once
+  includeAggregate: false  # set true to also scrape /metrics (all targets)
+  additionalEndpoints: []
+
+vmServiceScrape:
+  enabled: false
+  honorLabels: true
+  honorTimestamps: false
+  scrapeClass: ""
+  fallbackScrapeProtocol: ""
+  interval: 60s
+  scrapeTimeout: 50s
+  metricRelabelings: []
+  relabelings: []
+  sampleLimit: null
+  labelLimit: null
+  tlsConfig: {}
+  basicAuth: {}
+  labels: {}
+  # Inherits split* from serviceMonitor when omitted.
+  splitByTarget: true
+  splitBySource: true
+  scrapeSelf: true
+  includeAggregate: false
+
+# Optional Prometheus Operator ScrapeConfig (v1alpha1) for clusters without ServiceMonitor.
+scrapeConfig:
+  enabled: false
+  honorTimestamps: false
+  interval: ""
+  scrapeTimeout: ""
+  labels: {}
+
+networkPolicy:
+  # Recommended true in production together with ingressFrom + brokerCIDRs.
+  enabled: false
+  # Restrict ingress to Prometheus / VictoriaMetrics scrape pods when possible.
+  ingressFrom: []
+  # - namespaceSelector:
+  #     matchLabels:
+  #       kubernetes.io/metadata.name: monitoring
+  # Required when enabled: egress to brokerPorts is limited to these CIDRs only.
+  brokerCIDRs: []
+  # - 10.0.0.0/8
+  brokerPorts:
+    - 5672
+    - 15672
+    - 15692
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Sharding uses separate Helm releases (unique config.sharding.shard_index), not replicaCount.
+sharding:
+  enabled: false
+  shardCount: 1
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

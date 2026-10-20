@@ -1,0 +1,124 @@
+{{- if .Values.serviceMonitor.enabled }}
+{{- $cfg := dict }}
+{{- if kindIs "string" .Values.config }}
+  {{- $cfg = .Values.config | fromYaml }}
+{{- else if .Values.config }}
+  {{- $cfg = .Values.config }}
+{{- end }}
+{{- $splitTarget := true }}
+{{- if hasKey .Values.serviceMonitor "splitByTarget" }}
+  {{- $splitTarget = .Values.serviceMonitor.splitByTarget }}
+{{- end }}
+{{- $splitSource := true }}
+{{- if hasKey .Values.serviceMonitor "splitBySource" }}
+  {{- $splitSource = .Values.serviceMonitor.splitBySource }}
+{{- end }}
+{{- $scrapeSelf := true }}
+{{- if hasKey .Values.serviceMonitor "scrapeSelf" }}
+  {{- $scrapeSelf = .Values.serviceMonitor.scrapeSelf }}
+{{- end }}
+{{- $includeAggregate := false }}
+{{- if hasKey .Values.serviceMonitor "includeAggregate" }}
+  {{- $includeAggregate = .Values.serviceMonitor.includeAggregate }}
+{{- end }}
+{{- $smScrape := .Values.serviceMonitor }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "rabbitmq-unified-exporter.fullname" . }}
+  labels:
+    {{- include "rabbitmq-unified-exporter.labels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "rabbitmq-unified-exporter.selectorLabels" . | nindent 6 }}
+  endpoints:
+    {{- if or (not $splitTarget) $includeAggregate }}
+    {{- include "rabbitmq-unified-exporter.smSimpleEndpoint" (dict "root" $ "path" "/metrics" "scrape" $smScrape) | nindent 4 }}
+    {{- end }}
+
+    {{- if and $splitTarget $scrapeSelf }}
+    {{- include "rabbitmq-unified-exporter.smSimpleEndpoint" (dict
+        "root" $
+        "path" "/metrics/self"
+        "scrape" $smScrape
+        "relabelings" (list
+          (dict "targetLabel" "exporter_source" "replacement" "self" "action" "replace")
+        )
+      ) | nindent 4 }}
+    {{- end }}
+
+    {{- if $splitTarget }}
+    {{- range $group := $cfg.groups | default list }}
+    {{- $groupName := required "config.groups[].name is required" $group.name }}
+    {{- $groupLabels := $group.labels | default dict }}
+    {{- range $target := $group.targets | default list }}
+    {{- $targetName := required (printf "config.groups[%s].targets[].name is required" $groupName) $target.name }}
+    {{- $mergedLabels := merge (dict) $groupLabels ($target.labels | default dict) }}
+    {{- if not (index $mergedLabels "job") }}
+      {{- $_ := set $mergedLabels "job" (printf "rabbitmq-%s-metrics" $groupName) }}
+    {{- end }}
+    {{- if not (index $mergedLabels "instance") }}
+      {{- $_ := set $mergedLabels "instance" $targetName }}
+    {{- end }}
+    {{- if $splitSource }}
+    {{- include "rabbitmq-unified-exporter.scrapeEndpoint" (dict
+        "root" $
+        "path" (printf "/metrics/targets/%s/%s/prometheus" $groupName $targetName)
+        "source" "prometheus"
+        "labels" $mergedLabels
+        "scrape" $smScrape
+      ) | nindent 4 }}
+    {{- $mgmtEnabled := dig "management" "enabled" false $group }}
+    {{- if hasKey ($target | default dict) "management" }}
+      {{- $mgmtEnabled = dig "management" "enabled" $mgmtEnabled $target }}
+    {{- end }}
+    {{- if $mgmtEnabled }}
+    {{- include "rabbitmq-unified-exporter.scrapeEndpoint" (dict
+        "root" $
+        "path" (printf "/metrics/targets/%s/%s/management" $groupName $targetName)
+        "source" "management"
+        "labels" $mergedLabels
+        "scrape" $smScrape
+      ) | nindent 4 }}
+    {{- end }}
+    {{- $probes := $group.probes | default dict }}
+    {{- if hasKey ($target | default dict) "probes" }}
+      {{- $probes = $target.probes | default $probes }}
+    {{- end }}
+    {{- if or (dig "amqp_tcp" "enabled" false $probes) (dig "amqp_auth" "enabled" false $probes) (dig "delivery_test" "enabled" false $probes) }}
+    {{- include "rabbitmq-unified-exporter.scrapeEndpoint" (dict
+        "root" $
+        "path" (printf "/metrics/targets/%s/%s/probes" $groupName $targetName)
+        "source" "probes"
+        "labels" $mergedLabels
+        "scrape" $smScrape
+      ) | nindent 4 }}
+    {{- end }}
+    {{- else }}
+    {{- include "rabbitmq-unified-exporter.scrapeEndpoint" (dict
+        "root" $
+        "path" (printf "/metrics/targets/%s/%s" $groupName $targetName)
+        "source" "target"
+        "labels" $mergedLabels
+        "scrape" $smScrape
+      ) | nindent 4 }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
+    {{- range .Values.serviceMonitor.additionalEndpoints | default list }}
+    {{- $epScrape := merge (dict) $smScrape }}
+    {{- if .interval }}
+      {{- $_ := set $epScrape "interval" .interval }}
+    {{- end }}
+    {{- if .scrapeTimeout }}
+      {{- $_ := set $epScrape "scrapeTimeout" .scrapeTimeout }}
+    {{- end }}
+    {{- include "rabbitmq-unified-exporter.smSimpleEndpoint" (dict "root" $ "path" .path "scrape" $epScrape) | nindent 4 }}
+    {{- end }}
+{{- end }}

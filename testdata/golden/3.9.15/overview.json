@@ -1,0 +1,16 @@
+{
+  "node": "rabbit@n1",
+  "cluster_name": "example-cluster",
+  "rabbitmq_version": "3.9.15",
+  "erlang_version": "24.3.4",
+  "object_totals": {"channels": 2, "connections": 1, "consumers": 3, "exchanges": 10, "queues": 2},
+  "queue_totals": {
+    "messages": 7,
+    "messages_ready": 5,
+    "messages_unacknowledged": 2,
+    "messages_details": {"rate": 0.0},
+    "messages_ready_details": {"rate": 0.0},
+    "messages_unacknowledged_details": {"rate": 0.0}
+  },
+  "listeners": [{"node": "rabbit@n1", "protocol": "amqp", "ip_address": "::", "port": 5672}]
+}

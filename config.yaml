@@ -1,0 +1,133 @@
+server:
+  listen_address: ":9419"
+  metrics_path: /metrics
+
+defaults:
+  scrape_interval: 30s
+  scrape_timeout: 20s
+  max_staleness: 90s
+  max_concurrency: 10
+  max_response_bytes: 16777216
+  jitter_ratio: 0.1
+  sanitize:
+    enabled: true
+    invalid_values:
+      - unknown
+      - undefined
+      - null
+    strategy: drop_sample
+    max_invalid_samples: 10000
+  limits:
+    max_series_per_target: 200000
+    max_queues: 5000
+    page_size: 500
+
+groups:
+  - name: prod
+    labels:
+      job: rabbitmq-prod-metrics
+      environment: prod
+      cluster: rabbitmq-prod
+    expected_cluster_nodes: 3
+    expected_rabbitmq_cluster_name: rabbitmq-prod
+    metrics_source: prometheus
+    management:
+      enabled: true
+      credentials:
+        username_file: /secrets/prod/username
+        password_file: /secrets/prod/password
+      collectors:
+        - overview
+        - nodes
+        - queues
+        - vhosts
+        - health_checks
+        - federation
+        - shovels
+    prometheus:
+      endpoints:
+        - path: /metrics
+        - path: /metrics/detailed
+          params:
+            family:
+              - queue_coarse_metrics
+              - queue_metrics
+              - queue_delivery_metrics
+              - channel_queue_exchange_metrics
+        - path: /metrics/detailed
+          params:
+            family:
+              - ra_metrics
+    probes:
+      amqp_tcp:
+        enabled: true
+        interval: 15s
+        timeout: 5s
+      amqp_auth:
+        enabled: true
+        interval: 30s
+        timeout: 10s
+        vhosts: ["/"]
+        credentials:
+          username_file: /secrets/prod/username
+          password_file: /secrets/prod/password
+      delivery_test:
+        enabled: false
+        vhost: monitoring
+        interval: 60s
+        timeout: 15s
+      emit_probe_success_alias: false
+    targets:
+      - name: rmq-prod-01
+        metrics_url: http://rmq-prod-01.example.com:15692
+        management_url: http://rmq-prod-01.example.com:15672
+        amqp_address: rmq-prod-01.example.com:5672
+      - name: rmq-prod-02
+        metrics_url: http://rmq-prod-02.example.com:15692
+        management_url: http://rmq-prod-02.example.com:15672
+        amqp_address: rmq-prod-02.example.com:5672
+      - name: rmq-prod-03
+        metrics_url: http://rmq-prod-03.example.com:15692
+        management_url: http://rmq-prod-03.example.com:15672
+        amqp_address: rmq-prod-03.example.com:5672
+
+  - name: staging
+    labels:
+      job: rabbitmq-staging-metrics
+      environment: staging
+      cluster: rabbitmq-staging
+    expected_cluster_nodes: 2
+    metrics_source: json
+    management:
+      enabled: true
+      credentials:
+        username_file: /secrets/staging/username
+        password_file: /secrets/staging/password
+      collectors:
+        - overview
+        - nodes
+        - queues
+        - vhosts
+        - health_checks
+        - federation
+        - shovels
+    probes:
+      amqp_tcp:
+        enabled: true
+        interval: 30s
+        timeout: 5s
+      amqp_auth:
+        enabled: false
+      delivery_test:
+        enabled: false
+    targets:
+      - name: rmq-staging-01
+        management_url: http://rmq-staging-01.example.com:15672
+        amqp_address: rmq-staging-01.example.com:5672
+        labels:
+          purpose: application-messaging
+      - name: rmq-staging-02
+        management_url: http://rmq-staging-02.example.com:15672
+        amqp_address: rmq-staging-02.example.com:5672
+        labels:
+          purpose: application-messaging

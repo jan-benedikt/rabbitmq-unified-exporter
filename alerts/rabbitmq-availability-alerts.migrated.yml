@@ -1,0 +1,229 @@
+# Migrated availability rules for rabbitmq-unified-exporter.
+# UIDs preserved. PromQL updated for central exporter semantics.
+# Import alongside alerts/rabbitmq_alerts.migrated.yaml.
+apiVersion: 1
+groups:
+- orgId: 1
+  name: Availability and alarms
+  folder: RabbitMQ
+  interval: 30s
+  rules:
+  - uid: rmq-cluster-node-count-degraded
+    title: RabbitMQ cluster node count degraded
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: min by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_cluster_nodes_running{job=~"rabbitmq.*"})
+        instant: true
+        refId: A
+    - refId: B
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: max by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_cluster_nodes{job=~"rabbitmq.*"})
+        instant: true
+        refId: B
+    noDataState: NoData
+    execErrState: Error
+    for: 5m
+    annotations:
+      description: Observed running nodes below configured expected cluster size.
+    labels:
+      severity: warning
+      service: rabbitmq
+
+  - uid: rmq-cluster-node-majority-lost
+    title: RabbitMQ cluster node majority lost
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: min by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_cluster_nodes_running{job=~"rabbitmq.*"})
+        instant: true
+        refId: A
+    - refId: B
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: max by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_cluster_nodes{job=~"rabbitmq.*"})
+        instant: true
+        refId: B
+    noDataState: NoData
+    execErrState: Error
+    for: 2m
+    annotations:
+      description: Running nodes are at or below majority of expected cluster size.
+    labels:
+      severity: critical
+      service: rabbitmq
+
+  - uid: rmq-amqp-endpoint-down
+    title: RabbitMQ AMQP endpoint unavailable
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        # Migrated from probe_success{service="rabbitmq",probe="amqp_tcp"}
+        expr: min by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus, instance) (rabbitmq_amqp_tcp_success{job=~"rabbitmq.*"})
+        instant: true
+        refId: A
+    noDataState: NoData
+    execErrState: Error
+    for: 2m
+    annotations:
+      description: AMQP TCP connectivity check failed for instance {{ $labels.instance }}.
+    labels:
+      severity: critical
+      service: rabbitmq
+
+  - uid: rmq-application-not-running
+    title: RabbitMQ application is not running
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: min by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus, instance) (rabbitmq_application_running{job=~"rabbitmq.*"})
+        instant: true
+        refId: A
+    noDataState: NoData
+    execErrState: Error
+    for: 2m
+    labels:
+      severity: critical
+      service: rabbitmq
+
+  - uid: rmq-quorum-queue-unavailable
+    title: RabbitMQ quorum queue unavailable
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: min by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) (rabbitmq_quorum_queue_available{job=~"rabbitmq.*", queue!=""})
+        instant: true
+        refId: A
+    noDataState: NoData
+    execErrState: Error
+    for: 5m
+    labels:
+      severity: critical
+      service: rabbitmq
+
+  - uid: rmq-virtual-host-unavailable
+    title: RabbitMQ virtual host is unavailable
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: min by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus, instance, vhost) (rabbitmq_vhost_running{job=~"rabbitmq.*", vhost!=""})
+        instant: true
+        refId: A
+    noDataState: NoData
+    execErrState: Error
+    for: 5m
+    labels:
+      severity: warning
+      service: rabbitmq
+
+  - uid: rmq-expected-target-missing
+    title: RabbitMQ expected target is missing
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        # Migrated from up{} — use exporter per-target up
+        expr: |
+          (
+            max by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus, instance) (rabbitmq_expected_target{job=~"rabbitmq.*"})
+            unless
+            max by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus, instance) (rabbitmq_unified_exporter_target_up{job=~"rabbitmq.*"} == 1)
+          )
+        instant: true
+        refId: A
+    noDataState: NoData
+    execErrState: Error
+    for: 5m
+    labels:
+      severity: warning
+      service: rabbitmq
+
+  - uid: rmq-message-delivery-test-failed
+    title: RabbitMQ message delivery test failed
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: min by (job, domain, environment, platform, projectid, cluster, k8s_cluster_name, prometheus, instance, endpoint, vhost) (rabbitmq_message_delivery_test_success{job=~"rabbitmq.*"})
+        instant: true
+        refId: A
+    noDataState: NoData
+    execErrState: Error
+    for: 5m
+    labels:
+      severity: warning
+      service: rabbitmq
+
+  # New exporter-aware rules
+  - uid: rmq-exporter-target-down
+    title: RabbitMQ unified exporter target collection failed
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: min by (job, domain, environment, platform, projectid, cluster, instance, target) (rabbitmq_unified_exporter_collection_success) == 0
+        instant: true
+        refId: A
+    for: 3m
+    labels:
+      severity: warning
+      service: rabbitmq
+
+  - uid: rmq-cluster-partitions
+    title: RabbitMQ network partition detected
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: max by (job, domain, environment, platform, projectid, cluster, instance) (rabbitmq_cluster_partitions{job=~"rabbitmq.*"}) > 0
+        instant: true
+        refId: A
+    for: 1m
+    labels:
+      severity: critical
+      service: rabbitmq
+
+  - uid: rmq-data-stale
+    title: RabbitMQ exporter data is stale
+    condition: C
+    data:
+    - refId: A
+      relativeTimeRange: { from: 3600, to: 0 }
+      datasourceUid: PROMETHEUS_DS
+      model:
+        expr: max by (target, group, instance) (rabbitmq_unified_exporter_data_age_seconds) > 60
+        instant: true
+        refId: A
+    for: 5m
+    labels:
+      severity: warning
+      service: rabbitmq

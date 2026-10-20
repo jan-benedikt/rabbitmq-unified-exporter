@@ -1,0 +1,13 @@
+apiVersion: v2
+name: rabbitmq-unified-exporter
+description: Multi-target RabbitMQ metrics exporter with Prometheus sanitization, JSON adapter and AMQP probes
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - rabbitmq
+  - prometheus
+  - exporter
+maintainers:
+  - name: jan-benedikt
+    url: https://github.com/jan-benedikt

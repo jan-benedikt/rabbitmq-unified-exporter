@@ -1,0 +1,232 @@
+# RabbitMQ 4.x JSON mapping (field parity with 3.13). Prefer native Prometheus for production.
+version: "4.x"
+metrics:
+  - metric: rabbitmq_queue_messages
+    type: gauge
+    fidelity: exact
+    scope: queue
+    node_filter: self
+    unit: messages
+    json:
+      endpoint: /api/queues
+      field: messages
+    labels:
+      vhost: $.vhost
+      queue: $.name
+
+  - metric: rabbitmq_queue_messages_ready
+    type: gauge
+    fidelity: exact
+    scope: queue
+    node_filter: self
+    unit: messages
+    json:
+      endpoint: /api/queues
+      field: messages_ready
+    labels:
+      vhost: $.vhost
+      queue: $.name
+
+  - metric: rabbitmq_queue_messages_unacked
+    type: gauge
+    fidelity: exact
+    scope: queue
+    node_filter: self
+    unit: messages
+    json:
+      endpoint: /api/queues
+      field: messages_unacknowledged
+    labels:
+      vhost: $.vhost
+      queue: $.name
+
+  - metric: rabbitmq_queue_consumers
+    type: gauge
+    fidelity: exact
+    scope: queue
+    node_filter: self
+    json:
+      endpoint: /api/queues
+      field: consumers
+    labels:
+      vhost: $.vhost
+      queue: $.name
+
+  - metric: rabbitmq_queue_process_memory_bytes
+    type: gauge
+    fidelity: exact
+    scope: queue
+    node_filter: self
+    unit: bytes
+    json:
+      endpoint: /api/queues
+      field: memory
+    labels:
+      vhost: $.vhost
+      queue: $.name
+
+  - metric: rabbitmq_queue_messages_ram_bytes
+    type: gauge
+    fidelity: exact
+    scope: queue
+    node_filter: self
+    unit: bytes
+    json:
+      endpoint: /api/queues
+      field: message_bytes_ram
+    labels:
+      vhost: $.vhost
+      queue: $.name
+
+  - metric: rabbitmq_process_resident_memory_bytes
+    type: gauge
+    fidelity: exact
+    scope: node
+    unit: bytes
+    json:
+      endpoint: /api/nodes/{self}
+      field: mem_used
+
+  - metric: rabbitmq_resident_memory_limit_bytes
+    type: gauge
+    fidelity: exact
+    scope: node
+    unit: bytes
+    json:
+      endpoint: /api/nodes/{self}
+      field: mem_limit
+
+  - metric: rabbitmq_disk_space_available_bytes
+    type: gauge
+    fidelity: exact
+    scope: node
+    unit: bytes
+    json:
+      endpoint: /api/nodes/{self}
+      field: disk_free
+
+  - metric: rabbitmq_disk_space_available_limit_bytes
+    type: gauge
+    fidelity: exact
+    scope: node
+    unit: bytes
+    json:
+      endpoint: /api/nodes/{self}
+      field: disk_free_limit
+
+  - metric: rabbitmq_process_open_fds
+    type: gauge
+    fidelity: exact
+    scope: node
+    json:
+      endpoint: /api/nodes/{self}
+      field: fd_used
+
+  - metric: rabbitmq_process_max_fds
+    type: gauge
+    fidelity: exact
+    scope: node
+    json:
+      endpoint: /api/nodes/{self}
+      field: fd_total
+
+  - metric: rabbitmq_alarms_memory_used_watermark
+    type: gauge
+    fidelity: exact
+    scope: node
+    transform: bool_to_int
+    json:
+      endpoint: /api/nodes/{self}
+      field: mem_alarm
+
+  - metric: rabbitmq_alarms_free_disk_space_watermark
+    type: gauge
+    fidelity: exact
+    scope: node
+    transform: bool_to_int
+    json:
+      endpoint: /api/nodes/{self}
+      field: disk_free_alarm
+
+  - metric: rabbitmq_alarms_file_descriptor_limit
+    type: gauge
+    fidelity: approximate
+    scope: node
+    notes: "Derived from health check local-alarms when available; otherwise unsupported"
+    json:
+      endpoint: /api/health/checks/local-alarms
+      field: _health_fd_alarm
+
+  - metric: rabbitmq_global_messages_delivered_total
+    type: counter
+    fidelity: approximate
+    scope: node
+    notes: "Sum of queue message_stats.deliver_get for queues on this node; resets with stats DB"
+    json:
+      endpoint: /api/queues
+      field: message_stats.deliver_get
+    node_filter: self
+    aggregate: sum
+
+  - metric: rabbitmq_global_messages_redelivered_total
+    type: counter
+    fidelity: approximate
+    scope: node
+    notes: "Sum of queue message_stats.redeliver for queues on this node"
+    json:
+      endpoint: /api/queues
+      field: message_stats.redeliver
+    node_filter: self
+    aggregate: sum
+
+  - metric: rabbitmq_channel_messages_unroutable_dropped_total
+    type: counter
+    fidelity: unsupported
+    scope: channel
+    notes: "Management API has no per-exchange unroutable dropped counter matching native plugin labels"
+
+  - metric: rabbitmq_channel_messages_unroutable_returned_total
+    type: counter
+    fidelity: unsupported
+    scope: channel
+    notes: "Management API has no per-exchange unroutable returned counter matching native plugin labels"
+
+  - metric: rabbitmq_raft_entry_commit_latency_seconds
+    type: gauge
+    fidelity: unsupported
+    scope: queue
+    notes: "Raft metrics are only available from the Prometheus plugin (ra_metrics family)"
+
+  - metric: rabbitmq_raft_log_commit_index
+    type: counter
+    fidelity: unsupported
+    scope: queue
+    notes: "Raft metrics are only available from the Prometheus plugin"
+
+  - metric: rabbitmq_raft_log_last_written_index
+    type: counter
+    fidelity: unsupported
+    scope: queue
+    notes: "Raft metrics are only available from the Prometheus plugin"
+
+  - metric: rabbitmq_raft_log_last_applied_index
+    type: counter
+    fidelity: unsupported
+    scope: queue
+    notes: "Raft metrics are only available from the Prometheus plugin"
+
+  - metric: rabbitmq_raft_term_total
+    type: counter
+    fidelity: unsupported
+    scope: queue
+    notes: "Raft metrics are only available from the Prometheus plugin"
+
+  - metric: rabbitmq_erlang_uptime_seconds
+    type: counter
+    fidelity: approximate
+    scope: node
+    transform: ms_to_seconds
+    notes: "Management API uptime is in milliseconds"
+    json:
+      endpoint: /api/nodes/{self}
+      field: uptime

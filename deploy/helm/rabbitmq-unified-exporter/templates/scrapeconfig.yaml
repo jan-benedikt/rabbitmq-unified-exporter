@@ -1,0 +1,26 @@
+{{- if .Values.scrapeConfig.enabled }}
+{{- $interval := .Values.scrapeConfig.interval | default .Values.serviceMonitor.interval }}
+{{- $timeout := .Values.scrapeConfig.scrapeTimeout | default .Values.serviceMonitor.scrapeTimeout }}
+{{- $honorTimestamps := .Values.scrapeConfig.honorTimestamps }}
+{{- if not (hasKey .Values.scrapeConfig "honorTimestamps") }}
+  {{- $honorTimestamps = .Values.serviceMonitor.honorTimestamps }}
+{{- end }}
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: {{ include "rabbitmq-unified-exporter.fullname" . }}
+  labels:
+    {{- include "rabbitmq-unified-exporter.labels" . | nindent 4 }}
+    {{- with .Values.scrapeConfig.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  jobName: {{ include "rabbitmq-unified-exporter.fullname" . }}
+  honorTimestamps: {{ $honorTimestamps }}
+  scrapeInterval: {{ $interval }}
+  scrapeTimeout: {{ $timeout }}
+  metricsPath: /metrics
+  staticConfigs:
+    - targets:
+        - {{ printf "%s.%s.svc.cluster.local:%v" (include "rabbitmq-unified-exporter.fullname" .) .Release.Namespace .Values.service.port }}
+{{- end }}

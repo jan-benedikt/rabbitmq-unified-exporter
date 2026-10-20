@@ -1,0 +1,4362 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Queue details adapted for rabbitmq-unified-exporter. Job lists rabbitmq-* scrapes; metrics accept both rabbitmq_* and rabbitmq_detailed_* names. Filter by cluster and instance labels emitted by the exporter.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 100,
+      "panels": [],
+      "title": "Operational overview - delivery problems and backlog",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "id": 3001,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum by (domain, environment, instance, platform, projectid, vhost, exchange) (increase(rabbitmq_channel_messages_unroutable_dropped_total{vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}[$__range])))",
+          "format": "time_series",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Unroutable dropped - selected period",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "id": 106,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count((max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) > 0) and on (vhost, queue) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumers\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) == 0))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Backlog + No Consumers",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "id": 3002,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum by (domain, environment, instance, platform, projectid, vhost, exchange) (increase(rabbitmq_channel_messages_unroutable_returned_total{vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}[$__range])))",
+          "format": "time_series",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Unroutable returned - selected period",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 1000
+              },
+              {
+                "color": "red",
+                "value": 10000
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "id": 103,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_ready\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Ready Messages",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "id": 104,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_unacked\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Unacked Messages",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "id": 105,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) > 0)",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Queues with Backlog",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 4000,
+      "panels": [],
+      "title": "Problem queues - immediate investigation",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Total messages"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Ready"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Consumers"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 122,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Ready"
+          }
+        ]
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) > 0) and on (vhost, queue) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumers\", vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) == 0)",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_ready\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) and on (vhost, queue) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) > 0) and on (vhost, queue) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumers\", vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) == 0)",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumers\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) == 0) and on (vhost, queue) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) > 0)",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "C"
+        }
+      ],
+      "title": "Problem Queues - backlog without consumers",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "cluster": true,
+              "job": true,
+              "k8s_cluster_name": true,
+              "prometheus": true,
+              "prometheus_replica": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Time": 0,
+              "Value #A": 11,
+              "Value #B": 10,
+              "Value #C": 12,
+              "__name__": 1,
+              "cluster": 2,
+              "instance": 3,
+              "job": 4,
+              "k8s_cluster_name": 5,
+              "prometheus": 6,
+              "prometheus_replica": 7,
+              "queue": 8,
+              "vhost": 9
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 3000,
+      "panels": [],
+      "title": "Unroutable messages - exchange detail",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "id": 3005,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (domain, environment, instance, platform, projectid, vhost, exchange) (rate(rabbitmq_channel_messages_unroutable_dropped_total{vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}[$__rate_interval]))",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "{{vhost}} / {{exchange}} | {{instance}} | {{domain}} / {{environment}} / {{platform}} / {{projectid}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Unroutable dropped rate by exchange",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "id": 3006,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (domain, environment, instance, platform, projectid, vhost, exchange) (rate(rabbitmq_channel_messages_unroutable_returned_total{vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}[$__rate_interval]))",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "{{vhost}} / {{exchange}} | {{instance}} | {{domain}} / {{environment}} / {{platform}} / {{projectid}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Unroutable returned rate by exchange",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "id": 3003,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Messages"
+          }
+        ]
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (domain, environment, instance, platform, projectid, vhost, exchange) (increase(rabbitmq_channel_messages_unroutable_dropped_total{vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}[$__range]))",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Unroutable dropped by exchange - selected period",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "Value": 7,
+              "domain": 0,
+              "environment": 1,
+              "exchange": 6,
+              "instance": 2,
+              "platform": 3,
+              "projectid": 4,
+              "vhost": 5
+            },
+            "renameByName": {
+              "Value": "Messages"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 22
+      },
+      "id": 3004,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Messages"
+          }
+        ]
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (domain, environment, instance, platform, projectid, vhost, exchange) (increase(rabbitmq_channel_messages_unroutable_returned_total{vhost=~\"$vhost\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}[$__range]))",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Unroutable returned by exchange - selected period",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "Value": 7,
+              "domain": 0,
+              "environment": 1,
+              "exchange": 6,
+              "instance": 2,
+              "platform": 3,
+              "projectid": 4,
+              "vhost": 5
+            },
+            "renameByName": {
+              "Value": "Messages"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 110,
+      "panels": [],
+      "title": "VHOST overview and queue inventory",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 1000
+              },
+              {
+                "color": "red",
+                "value": 10000
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 0,
+        "y": 31
+      },
+      "id": 102,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Total Messages",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 31
+      },
+      "id": 101,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Queues",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vhost"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "VHOST"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Total messages"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Ready"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Unacked"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Queues"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #E"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Consumers"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 111,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Total messages"
+          }
+        ]
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (vhost) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (vhost) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_ready\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (vhost) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_unacked\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count by (vhost) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum by (vhost) (max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumers\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "E"
+        }
+      ],
+      "title": "VHOST Summary",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 42
+      },
+      "id": 130,
+      "panels": [],
+      "title": "Queue trends - backlog, consumers and memory",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 43
+      },
+      "id": 131,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_ready\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 2,
+          "legendFormat": "Ready - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_unacked\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 2,
+          "legendFormat": "Unacked - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 2,
+          "legendFormat": "Total - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Queue Depth - Ready / Unacked / Total",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "id": 132,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumers\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 2,
+          "legendFormat": "Consumers - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumer_capacity\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 2,
+          "legendFormat": "Capacity - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Consumers and Consumer Capacity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 59
+      },
+      "id": 133,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_process_memory_bytes\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 2,
+          "legendFormat": "Process memory - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_ram_bytes\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 2,
+          "legendFormat": "RAM message bytes - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Queue RAM usage",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 67
+      },
+      "id": 120,
+      "panels": [],
+      "title": "Queue details",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "job"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "instance"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vhost"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "VHOST"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "queue"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Queue"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Total"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Ready"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Unacked"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Consumers"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #E"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Consumer capacity"
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #F"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "RAM messages"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #G"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "RAM bytes"
+              },
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #H"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Queue process memory"
+              },
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 68
+      },
+      "id": 121,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Ready"
+          }
+        ]
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_ready\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_unacked\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumers\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumer_capacity\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_ram\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages_ram_bytes\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_process_memory_bytes\", vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "H"
+        }
+      ],
+      "title": "Queue Details",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 78
+      },
+      "id": 2001,
+      "panels": [],
+      "title": "Quorum / Raft - health overview",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 79
+      },
+      "id": 2003,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count((max by (vhost, queue) (rabbitmq_raft_log_last_written_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) - max by (vhost, queue) (rabbitmq_raft_log_commit_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})) > 0)",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Queues with uncommitted Raft entries",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 79
+      },
+      "id": 2004,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count((max by (vhost, queue) (rabbitmq_raft_log_commit_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) - max by (vhost, queue) (rabbitmq_raft_log_last_applied_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})) > 0)",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Queues with unapplied Raft entries",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 79
+      },
+      "id": 2005,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(max by (vhost, queue) (increase(rabbitmq_raft_term_total{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}[$__range])))",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Leader elections in range",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Count of queues exposing Raft metrics, i.e. quorum queues.",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 79
+      },
+      "id": 2002,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count(max by (vhost, queue) (rabbitmq_raft_log_commit_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Quorum queues",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 83
+      },
+      "id": 2040,
+      "panels": [],
+      "title": "Quorum / Raft - latency and elections",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 84
+      },
+      "id": 2041,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) (rabbitmq_raft_entry_commit_latency_seconds{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "legendFormat": "{{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Raft entry commit latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Increases in term_total. Occasional changes can be normal, sustained increases indicate instability or queue churn.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 84
+      },
+      "id": 2042,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) (increase(rabbitmq_raft_term_total{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}[$__rate_interval]))",
+          "format": "time_series",
+          "legendFormat": "{{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Leader elections / term changes",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 92
+      },
+      "id": 2030,
+      "panels": [],
+      "title": "Quorum / Raft - replication progress",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "last_written_index - commit_index. Growing values can indicate quorum/replication problems.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 93
+      },
+      "id": 2031,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(max by (vhost, queue) (rabbitmq_raft_log_last_written_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) - max by (vhost, queue) (rabbitmq_raft_log_commit_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "legendFormat": "{{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Uncommitted Raft entries",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "commit_index - last_applied_index. Growing values indicate members are committed but not applying entries fast enough.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 93
+      },
+      "id": 2032,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(max by (vhost, queue) (rabbitmq_raft_log_commit_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) - max by (vhost, queue) (rabbitmq_raft_log_last_applied_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "legendFormat": "{{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Unapplied Raft entries",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 101
+      },
+      "id": 2033,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(max by (vhost, queue) (rabbitmq_raft_log_last_written_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) - max by (vhost, queue) (rabbitmq_raft_log_snapshot_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "legendFormat": "{{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Entries since last snapshot",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 101
+      },
+      "id": 2034,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) (rabbitmq_raft_log_last_written_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "legendFormat": "Last written - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) (rabbitmq_raft_log_commit_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "legendFormat": "Commit - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) (rabbitmq_raft_log_last_applied_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "legendFormat": "Applied - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) (rabbitmq_raft_log_snapshot_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "time_series",
+          "legendFormat": "Snapshot - {{vhost}}/{{queue}}",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "Raft indices",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 109
+      },
+      "id": 2010,
+      "panels": [],
+      "title": "Quorum / Raft - queue details",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "instance"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "job"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "rabbitmq_cluster"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Cluster"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "rabbitmq_node"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Node"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vhost"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "VHost"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "queue"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Queue"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*Bytes|.*Memory.*/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*Latency.*/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "VHost"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 134
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 110
+      },
+      "id": 2011,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(max by (vhost, queue) (rabbitmq_raft_log_last_written_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) - max by (vhost, queue) (rabbitmq_raft_log_commit_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "Uncommitted Raft Entries",
+          "range": false,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(max by (vhost, queue) (rabbitmq_raft_log_commit_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) - max by (vhost, queue) (rabbitmq_raft_log_last_applied_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "Unapplied Raft Entries",
+          "range": false,
+          "refId": "J"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "(max by (vhost, queue) (rabbitmq_raft_log_last_written_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) - max by (vhost, queue) (rabbitmq_raft_log_snapshot_index{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "Entries Since Snapshot",
+          "range": false,
+          "refId": "K"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) (rabbitmq_raft_entry_commit_latency_seconds{vhost=~\"$vhost\", queue=~\"$queue\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "Commit Latency",
+          "range": false,
+          "refId": "L"
+        }
+      ],
+      "title": "Quorum / Raft queue details",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Value #A": "Messages Ready",
+              "Value #B": "Messages Unacked",
+              "Value #C": "Total Messages",
+              "Value #D": "Consumers",
+              "Value #E": "Consumer Capacity",
+              "Value #F": "Publish Rate",
+              "Value #G": "Deliver Rate",
+              "Value #H": "Ack Rate",
+              "Value #I": "Raft Commit Rate",
+              "Value #J": "Raft Pending Entries",
+              "Value #K": "Raft Commit Latency",
+              "Value #L": "Leader Elections"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 121
+      },
+      "id": 140,
+      "panels": [],
+      "title": "Federation - internal queue diagnostics",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 122
+      },
+      "id": 142,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumers\", vhost=~\"$vhost\", queue=~\"federation:.*\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) == 0)",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Federation Queues without consumer",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 122
+      },
+      "id": 143,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "sum(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"federation:.*\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Federation Queue Backlog",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 122
+      },
+      "id": 144,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumer_capacity\", vhost=~\"$vhost\", queue=~\"federation:.*\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}) < 1)",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Federation Capacity < 1",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 122
+      },
+      "id": 141,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "count(max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"federation:.*\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 2,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Federation Queues",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Messages"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Consumers"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Consumer capacity"
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 126
+      },
+      "id": 145,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 2,
+        "showHeader": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_messages\", vhost=~\"$vhost\", queue=~\"federation:.*\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumers\", vhost=~\"$vhost\", queue=~\"federation:.*\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "max by (vhost, queue) ({__name__=~\"rabbitmq_(detailed_)?queue_consumer_capacity\", vhost=~\"$vhost\", queue=~\"federation:.*\", cluster=~\"$cluster\", instance=~\"$instance\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"})",
+          "format": "table",
+          "instant": true,
+          "intervalFactor": 2,
+          "legendFormat": "",
+          "range": false,
+          "refId": "C"
+        }
+      ],
+      "title": "Federation Internal Queue Details",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 134
+      },
+      "id": 4001,
+      "panels": [],
+      "title": "Quorum & exporter health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "max": 1,
+          "min": 0
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 135
+      },
+      "id": 4002,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rabbitmq_quorum_queue_available{cluster=~\"$cluster\", instance=~\"$instance\", vhost=~\"$vhost\", queue=~\"$queue\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}",
+          "legendFormat": "{{vhost}}/{{queue}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          }
+        }
+      ],
+      "title": "Quorum queue available",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 135
+      },
+      "id": 4003,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rabbitmq_quorum_queue_online_members{cluster=~\"$cluster\", instance=~\"$instance\", vhost=~\"$vhost\", queue=~\"$queue\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}",
+          "legendFormat": "online {{vhost}}/{{queue}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          }
+        },
+        {
+          "expr": "rabbitmq_quorum_queue_members{cluster=~\"$cluster\", instance=~\"$instance\", vhost=~\"$vhost\", queue=~\"$queue\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}",
+          "legendFormat": "members {{vhost}}/{{queue}}",
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          }
+        }
+      ],
+      "title": "Quorum members online / members",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "max": 1,
+          "min": 0
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 143
+      },
+      "id": 4004,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rabbitmq_unified_exporter_collection_success{instance=~\"$instance\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\", rabbitmq_system=~\"$rabbitmq_system\"}",
+          "legendFormat": "{{instance}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          }
+        }
+      ],
+      "title": "Collection success (selected instances)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "max": 1,
+          "min": 0
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 143
+      },
+      "id": 4005,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rabbitmq_vhost_running{cluster=~\"$cluster\", instance=~\"$instance\", vhost=~\"$vhost\", rabbitmq_system=~\"$rabbitmq_system\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}",
+          "legendFormat": "{{instance}} {{vhost}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          }
+        }
+      ],
+      "title": "VHost running",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": [
+    "queues",
+    "unified-exporter",
+    "rabbitmq",
+    "RabbitMQ"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "",
+          "value": ""
+        },
+        "label": "Datasource",
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\"}, domain)",
+        "description": "Filter by domain label from the unified exporter.",
+        "includeAll": true,
+        "label": "Domain",
+        "name": "domain",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\"}, domain)",
+          "refId": "domainQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query",
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\"}, environment)",
+        "description": "Filter by environment label (e.g. prd, npd).",
+        "includeAll": true,
+        "label": "Environment",
+        "name": "environment",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\"}, environment)",
+          "refId": "environmentQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query",
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\"}, projectid)",
+        "description": "Filter by projectid label.",
+        "includeAll": true,
+        "label": "Project ID",
+        "name": "projectid",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\"}, projectid)",
+          "refId": "projectidQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query",
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}, rabbitmq_system)",
+        "description": "Filter by rabbitmq_system label (optional application/system split).",
+        "includeAll": true,
+        "label": "RabbitMQ System",
+        "name": "rabbitmq_system",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\"}, rabbitmq_system)",
+          "refId": "rabbitmq_systemQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query",
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\", rabbitmq_system=~\"$rabbitmq_system\"}, cluster)",
+        "description": "Filter by cluster label from the unified exporter.",
+        "includeAll": true,
+        "label": "Cluster",
+        "name": "cluster",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\", rabbitmq_system=~\"$rabbitmq_system\"}, cluster)",
+          "refId": "clusterQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query",
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\", rabbitmq_system=~\"$rabbitmq_system\", cluster=~\"$cluster\"}, instance)",
+        "description": "Filter by instance (broker host:port).",
+        "includeAll": true,
+        "label": "Instance",
+        "name": "instance",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\", rabbitmq_system=~\"$rabbitmq_system\", cluster=~\"$cluster\"}, instance)",
+          "refId": "instanceQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query",
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\", rabbitmq_system=~\"$rabbitmq_system\", cluster=~\"$cluster\", instance=~\"$instance\"}, vhost)",
+        "includeAll": true,
+        "label": "VHOST",
+        "multi": true,
+        "name": "vhost",
+        "options": [],
+        "query": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\", rabbitmq_system=~\"$rabbitmq_system\", cluster=~\"$cluster\", instance=~\"$instance\"}, vhost)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query",
+        "allValue": ".*",
+        "description": "Filter by RabbitMQ virtual host."
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\", rabbitmq_system=~\"$rabbitmq_system\", cluster=~\"$cluster\", instance=~\"$instance\", vhost=~\"$vhost\"}, queue)",
+        "includeAll": true,
+        "label": "Queue",
+        "multi": true,
+        "name": "queue",
+        "options": [],
+        "query": "label_values({__name__=~\"rabbitmq_(detailed_)?queue_messages\", domain=~\"$domain\", environment=~\"$environment\", projectid=~\"$projectid\", rabbitmq_system=~\"$rabbitmq_system\", cluster=~\"$cluster\", instance=~\"$instance\", vhost=~\"$vhost\"}, queue)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query",
+        "allValue": ".*",
+        "description": "Filter by queue name."
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "RabbitMQ / Queue Details",
+  "uid": "rabbitmq-queue-details-consolidated",
+  "version": 1
+}

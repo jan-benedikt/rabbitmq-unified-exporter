@@ -1,0 +1,19 @@
+# TYPE rabbitmq_build_info untyped
+# HELP rabbitmq_build_info RabbitMQ & Erlang/OTP version info
+rabbitmq_build_info{rabbitmq_version="3.9.15",prometheus_plugin_version="3.9.15",prometheus_client_version="4.8.2",erlang_version="24.3.4"} 1
+# TYPE rabbitmq_identity_info untyped
+# HELP rabbitmq_identity_info RabbitMQ node & cluster identity info
+rabbitmq_identity_info{rabbitmq_node="rabbit@node-a",rabbitmq_cluster="example-cluster",rabbitmq_cluster_permanent_id="rabbitmq-cluster-id-example"} 1
+# TYPE rabbitmq_disk_space_available_bytes gauge
+# HELP rabbitmq_disk_space_available_bytes Disk space available in bytes
+rabbitmq_disk_space_available_bytes unknown
+# TYPE rabbitmq_disk_space_available_limit_bytes gauge
+# HELP rabbitmq_disk_space_available_limit_bytes Disk space free limit in bytes
+rabbitmq_disk_space_available_limit_bytes 50000000000
+# TYPE rabbitmq_queue_messages_ready gauge
+# HELP rabbitmq_queue_messages_ready Messages ready to be delivered to clients
+rabbitmq_queue_messages_ready{vhost="/",queue="orders"} 3
+rabbitmq_queue_messages_ready{vhost="/",queue="events"} 0
+# TYPE rabbitmq_alarms_memory_used_watermark gauge
+# HELP rabbitmq_alarms_memory_used_watermark Whether the memory alarm is active
+rabbitmq_alarms_memory_used_watermark 0

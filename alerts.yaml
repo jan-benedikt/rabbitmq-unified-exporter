@@ -1,0 +1,2346 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: Availability and alarms
+      folder: RabbitMQ
+      interval: 30s
+      rules:
+        - uid: bfmt4z5nvdddsc
+          title: RabbitMQ memory alarm is active
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_alarms_memory_used_watermark{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rabbitmq-management-overview-extended
+          panelId: 101
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            __dashboardUid__: rabbitmq-management-overview-extended
+            __panelId__: "101"
+            description: |-
+                RabbitMQ resource alarm is active. Check memory, disk, connections and publisher blocking. Value: {{ $values.RA.Value }}.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}
+                Evaluation interval: 30s
+                Pending period: 1m
+                Observed: memory alarm={{ $values.RA.Value }}
+            summary: 'RabbitMQ memory watermark alarm: alarm={{ printf "%.0f" $values.RA.Value }} (threshold >0 for 1m); publisher blocking may delay message delivery.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}'
+          labels:
+            alert_scope: node
+            category: availability-and-alarms
+            service: rabbitmq
+            severity: critical
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: ffmt54yhu9qf4a
+          title: RabbitMQ disk alarm is active
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_alarms_free_disk_space_watermark{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rabbitmq-management-overview-extended
+          panelId: 102
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            __dashboardUid__: rabbitmq-management-overview-extended
+            __panelId__: "102"
+            description: |-
+                RabbitMQ resource alarm is active. Check memory, disk, connections and publisher blocking. Value: {{ $values.RA.Value }}.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}
+                Evaluation interval: 30s
+                Pending period: 1m
+                Observed: disk alarm={{ $values.RA.Value }}
+            summary: 'RabbitMQ low-disk alarm: alarm={{ printf "%.0f" $values.RA.Value }} (threshold >0 for 1m); insufficient free disk may block publishers.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}'
+          labels:
+            alert_scope: node
+            category: availability-and-alarms
+            service: rabbitmq
+            severity: critical
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: efmt5a8ib7j7kf
+          title: RabbitMQ file descriptor alarm is active
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_alarms_file_descriptor_limit{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            description: |-
+                RabbitMQ resource alarm is active. Check memory, disk, connections and publisher blocking. Value: {{ $values.RA.Value }}.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}
+                Evaluation interval: 30s
+                Pending period: 1m
+                Observed: FD alarm={{ $values.RA.Value }}
+            summary: 'RabbitMQ file descriptor alarm: alarm={{ printf "%.0f" $values.RA.Value }} (threshold >0 for 1m); descriptor exhaustion threatens new connections and file access.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}'
+          labels:
+            alert_scope: node
+            category: availability-and-alarms
+            service: rabbitmq
+            severity: critical
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-scrape-down
+          title: RabbitMQ metrics target is unavailable
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: min by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (up{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 2m
+          annotations:
+            description: |-
+                The configured scrape target has been failing for 2 minutes. This detects monitoring endpoint failure, not proof that the broker process is down.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}
+                Evaluation interval: 30s
+                Pending period: 2m
+                Observed: up={{ $values.RA.Value }}
+            summary: 'RabbitMQ metrics endpoint unavailable: up={{ printf "%.0f" $values.RA.Value }} (expected 1) for 2m; monitoring cannot scrape this target.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}'
+          labels:
+            alert_scope: node
+            category: availability-and-alarms
+            service: rabbitmq
+            severity: critical
+          isPaused: true
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-targets-missing
+          title: RabbitMQ scrape targets are missing
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: absent(up{job=~"rabbitmq.*"}) or vector(0)
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          annotations:
+            description: |-
+                No up series exist for the configured RabbitMQ job scope. Check service discovery and scrape configuration. This cannot detect one removed target while others remain.
+
+                Scope: all jobs matching rabbitmq.*. This alert cannot carry instance, project or cluster labels because the source series are absent. Evaluation: 30s; pending: 5m.
+            summary: 'RabbitMQ monitoring coverage missing: absent(up)={{ printf "%.0f" $values.RA.Value }} (1 means no targets) for 5m; no scrape targets found for job scope rabbitmq.*.'
+          labels:
+            alert_scope: monitoring
+            category: availability-and-alarms
+            service: rabbitmq
+            severity: critical
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+    - orgId: 1
+      name: PRD - Delivery reliability
+      folder: RabbitMQ
+      interval: 30s
+      rules:
+        - uid: rmq-unroutable-dropped
+          title: '[PRD] RabbitMQ unroutable messages dropped'
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: sum by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, exchange) (increase(rabbitmq_channel_messages_unroutable_dropped_total{job=~"rabbitmq.*", environment="prd"}[5m]))
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 3001
+          noDataState: OK
+          execErrState: Error
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "3001"
+            description: |-
+                Exchange{{ if $labels.exchange }} {{ $labels.exchange }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }}: {{ $values.RA.Value }} unroutable dropped messages estimated over 5 minutes. Aggregated after per-channel increase; short-lived channels may be missed.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.exchange }}
+                exchange: {{ $labels.exchange }}{{ end }}
+                Evaluation interval: 30s
+                Pending period: 0s
+                Observed: dropped={{ $values.RA.Value }} messages / 5m
+                Environment scope: prd only (exact source metric label match).
+            summary: '[PRD] RabbitMQ routing failure: approximately {{ printf "%.2f" $values.RA.Value }} unroutable messages dropped in the last 5m (threshold >0); these messages were not routed to a queue.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.exchange }} | exchange={{ $labels.exchange }}{{ end }}'
+          labels:
+            alert_scope: exchange
+            category: delivery-reliability
+            environment: prd
+            service: rabbitmq
+            severity: critical
+          isPaused: true
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-unroutable-returned
+          title: '[PRD] RabbitMQ unroutable messages returned'
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: sum by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, exchange) (increase(rabbitmq_channel_messages_unroutable_returned_total{job=~"rabbitmq.*", environment="prd"}[5m]))
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 3002
+          noDataState: OK
+          execErrState: Error
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "3002"
+            description: |-
+                Exchange{{ if $labels.exchange }} {{ $labels.exchange }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }}: {{ $values.RA.Value }} unroutable returned messages estimated over 5 minutes. Aggregated after per-channel increase; short-lived channels may be missed.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.exchange }}
+                exchange: {{ $labels.exchange }}{{ end }}
+                Evaluation interval: 30s
+                Pending period: 0s
+                Observed: returned={{ $values.RA.Value }} messages / 5m
+                Environment scope: prd only (exact source metric label match).
+            summary: '[PRD] RabbitMQ routing failure: approximately {{ printf "%.2f" $values.RA.Value }} unroutable messages returned to publishers in the last 5m (threshold >0); check exchange bindings and routing keys.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.exchange }} | exchange={{ $labels.exchange }}{{ end }}'
+          labels:
+            alert_scope: exchange
+            category: delivery-reliability
+            environment: prd
+            service: rabbitmq
+            severity: warning
+          isPaused: true
+          notification_settings:
+            receiver: OnCall
+        - uid: afwivam51jzlsb
+          title: '[PRD] RabbitMQ high redelivery ratio'
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: sum by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rate(rabbitmq_global_messages_redelivered_total{job=~"rabbitmq.*", environment="prd"}[5m]))
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: sum by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rate(rabbitmq_global_messages_delivered_total{job=~"rabbitmq.*", environment="prd"}[5m]))
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: B
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: RB
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RB
+                type: reduce
+            - refId: M
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: ($RB > 1) && ($RA > 0.1 * $RB)
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: M
+                type: math
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - M
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: M
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+            - refId: V
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: 100 * $RA / ($RB + ($RB == 0))
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: V
+                type: math
+          noDataState: NoData
+          execErrState: Error
+          for: 10m
+          annotations:
+            description: |-
+                Redelivery rate {{ $values.RA.Value }}/s exceeds 10% of total delivery rate {{ $values.RB.Value }}/s, with total delivery rate > 1/s. Verify these global counters in the selected scope.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}
+                Evaluation interval: 30s
+                Pending period: 10m
+                Observed: redelivered={{ $values.RA.Value }}/s, delivered={{ $values.RB.Value }}/s; threshold >10% and delivered >1/s
+                Environment scope: prd only (exact source metric label match).
+            summary: '[PRD] RabbitMQ repeated message delivery: redelivery ratio={{ printf "%.1f" $values.V.Value }}% (threshold >10% for 10m), redelivered={{ printf "%.2f" $values.RA.Value }}/s, total delivered={{ printf "%.2f" $values.RB.Value }}/s (>1/s required).{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}'
+          labels:
+            alert_scope: node
+            category: delivery-reliability
+            environment: prd
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+    - orgId: 1
+      name: PRD - Queue health
+      folder: RabbitMQ
+      interval: 1m
+      rules:
+        - uid: rmq-ready-high
+          title: '[PRD] RabbitMQ ready messages exceed 1000'
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1000
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 103
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "103"
+            description: |-
+                Queue{{ if $labels.queue }} {{ $labels.queue }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }} has {{ $values.RA.Value }} ready messages; threshold 1000 exceeded for 5 minutes.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.queue }}
+                queue: {{ $labels.queue }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 5m
+                Observed: ready={{ $values.RA.Value }}; threshold >1000
+                Environment scope: prd only (exact source metric label match).
+            summary: '[PRD] RabbitMQ ready backlog remains high: {{ printf "%.0f" $values.RA.Value }} messages waiting for delivery (threshold >1000 for 5m); check consumer throughput.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.queue }} | queue={{ $labels.queue }}{{ end }}'
+          labels:
+            alert_scope: queue
+            category: queue-health
+            environment: prd
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: dfwiv3wjula0wc
+          title: '[PRD] RabbitMQ unacknowledged messages remain high'
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_unacked", job=~"rabbitmq.*", environment="prd", queue!=""})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 100
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 104
+          noDataState: NoData
+          execErrState: Error
+          for: 15m
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "104"
+            description: |-
+                Queue{{ if $labels.queue }} {{ $labels.queue }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }} has more than 100 unacked messages for 15 minutes. This is sustained high occupancy, not proof the same messages are stuck.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.queue }}
+                queue: {{ $labels.queue }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 15m
+                Observed: unacked={{ $values.RA.Value }}; threshold >100
+                Environment scope: prd only (exact source metric label match).
+            summary: '[PRD] RabbitMQ unacknowledged backlog remains high: {{ printf "%.0f" $values.RA.Value }} delivered messages awaiting ACK (threshold >100 for 15m); slow processing or delayed acknowledgements may be involved.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.queue }} | queue={{ $labels.queue }}{{ end }}'
+          labels:
+            alert_scope: queue
+            category: queue-health
+            environment: prd
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-backlog-no-consumers
+          title: '[PRD] RabbitMQ ready backlog without consumers'
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_consumers", job=~"rabbitmq.*", environment="prd", queue!=""})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: B
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: RB
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RB
+                type: reduce
+            - refId: M
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: ($RA > 0) && ($RB == 0)
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: M
+                type: math
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - M
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: M
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 122
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "122"
+            description: |-
+                Queue{{ if $labels.queue }} {{ $labels.queue }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }} has ready messages and no consumers for 5 minutes. Polling/basic.get or intentionally parked queues may need exclusion.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.queue }}
+                queue: {{ $labels.queue }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 5m
+                Observed: ready={{ $values.RA.Value }}, consumers={{ $values.RB.Value }}
+                Environment scope: prd only (exact source metric label match).
+            summary: '[PRD] RabbitMQ ready messages have no consumers: ready={{ printf "%.0f" $values.RA.Value }}, consumers={{ printf "%.0f" $values.RB.Value }} (ready >0 and consumers=0 for 5m); check consumer availability or intentional polling.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.queue }} | queue={{ $labels.queue }}{{ end }}'
+          labels:
+            alert_scope: queue
+            category: queue-health
+            environment: prd
+            service: rabbitmq
+            severity: critical
+          isPaused: true
+          notification_settings:
+            receiver: OnCall
+    - orgId: 1
+      name: PRD - Sustained backlog growth
+      folder: RabbitMQ
+      interval: 1m
+      rules:
+        - uid: efwiuxf1db56oe
+          title: '[PRD] RabbitMQ ready backlog grows rapidly'
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""} offset 15m)
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: B
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: RB
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RB
+                type: reduce
+            - refId: M
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: ($RA > 1000) && (($RA - $RB) > 1000)
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: M
+                type: math
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - M
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: M
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+            - refId: V
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: $RA - $RB
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: V
+                type: math
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 131
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "131"
+            description: |-
+                Ready backlog{{ if $labels.queue }} for queue {{ $labels.queue }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }} increased by >1000 versus 15 minutes ago and is now >1000; condition persisted for 5 minutes. Intermediate decreases are allowed.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.queue }}
+                queue: {{ $labels.queue }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 5m
+                Observed: ready={{ $values.RA.Value }}, ready 15m ago={{ $values.RB.Value }}; growth >1000
+                Environment scope: prd only (exact source metric label match).
+            summary: '[PRD] RabbitMQ ready backlog growing rapidly: net growth={{ printf "%.0f" $values.V.Value }} messages over 15m (threshold >1000), ready={{ printf "%.0f" $values.RA.Value }} (>1000); conditions hold for 5m.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.queue }} | queue={{ $labels.queue }}{{ end }}'
+          labels:
+            alert_scope: queue
+            category: sustained-backlog-growth
+            environment: prd
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-ready-no-decrease
+          title: '[PRD] RabbitMQ ready backlog grows without observed decrease'
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""} offset 30m)
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: B
+            - refId: D
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: min_over_time((((max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""})) - (max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""} offset 1m))))[30m:1m])
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: D
+            - refId: E
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: count_over_time((((max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""})) - (max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) ({__name__=~"rabbitmq_(detailed_)?queue_messages_ready", job=~"rabbitmq.*", environment="prd", queue!=""} offset 1m))))[30m:1m])
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: E
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: RB
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RB
+                type: reduce
+            - refId: RD
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: D
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RD
+                type: reduce
+            - refId: RE
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: E
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RE
+                type: reduce
+            - refId: M
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: ($RA > 1000) && (($RA - $RB) > 1000) && ($RD >= 0) && ($RE >= 30)
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: M
+                type: math
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - M
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: M
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+            - refId: V
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: $RA - $RB
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: V
+                type: math
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 131
+          noDataState: NoData
+          execErrState: Error
+          for: 2m
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "131"
+            description: |-
+                Ready count >1000, net growth >1000 over 30 minutes, no negative 1-minute sampled change over the window, at least 30 valid changes; holds for 2 minutes. Flat steps are allowed. Shorter decreases can be missed and consumption can continue while arrivals exceed deliveries.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.queue }}
+                queue: {{ $labels.queue }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 2m
+                Observed: ready={{ $values.RA.Value }}, ready 30m ago={{ $values.RB.Value }}, min 1m change={{ $values.RD.Value }}; growth >1000
+                Environment scope: prd only (exact source metric label match).
+            summary: '[PRD] RabbitMQ ready backlog accumulates without observed decrease: net growth={{ printf "%.0f" $values.V.Value }} over 30m (>1000), ready={{ printf "%.0f" $values.RA.Value }} (>1000), minimum sampled 1m change={{ printf "%.0f" $values.RD.Value }} (>=0), valid changes={{ printf "%.0f" $values.RE.Value }} (>=30); conditions hold for 2m.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.queue }} | queue={{ $labels.queue }}{{ end }}'
+          labels:
+            alert_scope: queue
+            category: sustained-backlog-growth
+            environment: prd
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+    - orgId: 1
+      name: Quorum and Raft
+      folder: RabbitMQ
+      interval: 1m
+      rules:
+        - uid: ffwivi4tsxpmoa
+          title: RabbitMQ high Raft commit latency
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) (rabbitmq_raft_entry_commit_latency_seconds{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0.5
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+            - refId: V
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: 1000 * $RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: V
+                type: math
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 2041
+          noDataState: OK
+          execErrState: Error
+          for: 10m
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "2041"
+            description: |-
+                Queue{{ if $labels.queue }} {{ $labels.queue }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }} commit latency {{ $values.RA.Value }} seconds exceeds 500 ms for 10 minutes.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.queue }}
+                queue: {{ $labels.queue }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 10m
+                Observed: commit latency={{ $values.RA.Value }} s; threshold >0.5s
+            summary: 'RabbitMQ quorum commits are slow: commit latency={{ printf "%.1f" $values.V.Value }} ms (threshold >500 ms for 10m); check storage and replication health.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.queue }} | queue={{ $labels.queue }}{{ end }}'
+          labels:
+            alert_scope: queue
+            category: quorum-and-raft
+            service: rabbitmq
+            severity: warning
+          isPaused: true
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-raft-uncommitted
+          title: RabbitMQ Raft uncommitted entries persist
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) (rabbitmq_raft_log_last_written_index{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) (rabbitmq_raft_log_commit_index{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: B
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: RB
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RB
+                type: reduce
+            - refId: M
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: ($RA - $RB) > 1000
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: M
+                type: math
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - M
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: M
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+            - refId: V
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: $RA - $RB
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: V
+                type: math
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 2031
+          noDataState: OK
+          execErrState: Error
+          for: 10m
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "2031"
+            description: |-
+                Queue{{ if $labels.queue }} {{ $labels.queue }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }} has a written-to-commit gap >1000 for 10 minutes. Tune to traffic volume.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.queue }}
+                queue: {{ $labels.queue }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 10m
+                Observed: written index={{ $values.RA.Value }}, commit index={{ $values.RB.Value }}; gap >1000
+            summary: 'RabbitMQ quorum replication is lagging: {{ printf "%.0f" $values.V.Value }} written Raft entries remain uncommitted (gap >1000 for 10m).{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.queue }} | queue={{ $labels.queue }}{{ end }}'
+          labels:
+            alert_scope: queue
+            category: quorum-and-raft
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-raft-unapplied
+          title: RabbitMQ Raft unapplied entries persist
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) (rabbitmq_raft_log_commit_index{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) (rabbitmq_raft_log_last_applied_index{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: B
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: RB
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RB
+                type: reduce
+            - refId: M
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: ($RA - $RB) > 1000
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: M
+                type: math
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - M
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: M
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+            - refId: V
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: $RA - $RB
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: V
+                type: math
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 2032
+          noDataState: OK
+          execErrState: Error
+          for: 10m
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "2032"
+            description: |-
+                Queue{{ if $labels.queue }} {{ $labels.queue }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }} has a commit-to-applied gap >1000 for 10 minutes. Tune to traffic volume.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.queue }}
+                queue: {{ $labels.queue }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 10m
+                Observed: commit index={{ $values.RA.Value }}, applied index={{ $values.RB.Value }}; gap >1000
+            summary: 'RabbitMQ quorum application is lagging: {{ printf "%.0f" $values.V.Value }} committed Raft entries remain unapplied (gap >1000 for 10m).{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.queue }} | queue={{ $labels.queue }}{{ end }}'
+          labels:
+            alert_scope: queue
+            category: quorum-and-raft
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-raft-elections
+          title: RabbitMQ frequent Raft term changes
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus, vhost, queue) (increase(rabbitmq_raft_term_total{job=~"rabbitmq.*"}[15m]))
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 3
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - RA
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: RA
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rabbitmq-queue-details-consolidated
+          panelId: 2042
+          noDataState: OK
+          execErrState: Error
+          for: 2m
+          annotations:
+            __dashboardUid__: rabbitmq-queue-details-consolidated
+            __panelId__: "2042"
+            description: |-
+                Queue{{ if $labels.queue }} {{ $labels.queue }}{{ end }}{{ if $labels.vhost }} in VHOST {{ $labels.vhost }}{{ end }} has >3 estimated Raft term changes over 15 minutes. Check node restarts, network and quorum stability.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}{{ if $labels.vhost }}
+                vhost: {{ $labels.vhost }}{{ end }}{{ if $labels.queue }}
+                queue: {{ $labels.queue }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 2m
+                Observed: term changes={{ $values.RA.Value }} / 15m; threshold >3
+            summary: 'RabbitMQ Raft leadership may be unstable: approximately {{ printf "%.2f" $values.RA.Value }} term changes over 15m (threshold >3 for 2m); check restarts and network stability.{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}{{ if $labels.vhost }} | vhost={{ $labels.vhost }}{{ end }}{{ if $labels.queue }} | queue={{ $labels.queue }}{{ end }}'
+          labels:
+            alert_scope: queue
+            category: quorum-and-raft
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+    - orgId: 1
+      name: Resource capacity
+      folder: RabbitMQ
+      interval: 1m
+      rules:
+        - uid: bfwiul88ey2o0d
+          title: RabbitMQ file descriptor usage high
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_process_open_fds{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_process_max_fds{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: B
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: RB
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RB
+                type: reduce
+            - refId: M
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: ($RB > 0) && ($RA > 0.8 * $RB)
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: M
+                type: math
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - M
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: M
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+            - refId: V
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: 100 * $RA / ($RB + ($RB == 0))
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: V
+                type: math
+          noDataState: NoData
+          execErrState: Error
+          for: 10m
+          annotations:
+            description: |-
+                Open FDs {{ $values.RA.Value }} exceed 80% of limit {{ $values.RB.Value }} for 10 minutes.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 10m
+                Observed: open FDs={{ $values.RA.Value }}, limit={{ $values.RB.Value }}; threshold >80%
+            summary: 'RabbitMQ file descriptors nearing exhaustion: {{ printf "%.1f" $values.V.Value }}% used ({{ printf "%.0f" $values.RA.Value }}/{{ printf "%.0f" $values.RB.Value }} descriptors; threshold >80% for 10m).{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}'
+          labels:
+            alert_scope: node
+            category: resource-capacity
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-memory-headroom
+          title: RabbitMQ memory is approaching watermark
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_process_resident_memory_bytes{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_resident_memory_limit_bytes{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: B
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: RB
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RB
+                type: reduce
+            - refId: M
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: ($RB > 0) && ($RA > 0.85 * $RB)
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: M
+                type: math
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - M
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: M
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+            - refId: V
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: 100 * $RA / ($RB + ($RB == 0))
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: V
+                type: math
+          noDataState: NoData
+          execErrState: Error
+          for: 10m
+          annotations:
+            description: |-
+                Memory usage exceeds 85% of the configured watermark for 10 minutes. Usage {{ $values.RA.Value }} bytes; watermark {{ $values.RB.Value }} bytes.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 10m
+                Observed: memory={{ $values.RA.Value }} B, watermark={{ $values.RB.Value }} B; threshold >85%
+            summary: 'RabbitMQ memory nearing publisher-blocking watermark: {{ printf "%.1f" $values.V.Value }}% of watermark used (threshold >85% for 10m).{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}'
+          labels:
+            alert_scope: node
+            category: resource-capacity
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall
+        - uid: rmq-disk-headroom
+          title: RabbitMQ disk is approaching watermark
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_disk_space_available_bytes{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 3600
+                to: 0
+              datasourceUid: PROMETHEUS_DS
+              model:
+                datasource:
+                    type: prometheus
+                    uid: PROMETHEUS_DS
+                editorMode: code
+                expr: max by (job, domain, environment, instance, platform, projectid, cluster, k8s_cluster_name, prometheus) (rabbitmq_disk_space_available_limit_bytes{job=~"rabbitmq.*"})
+                format: time_series
+                instant: true
+                intervalMs: 30000
+                maxDataPoints: 2400
+                range: false
+                refId: B
+            - refId: RA
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RA
+                type: reduce
+            - refId: RB
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: RB
+                type: reduce
+            - refId: M
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: ($RB > 0) && ($RA < 2 * $RB)
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: M
+                type: math
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - M
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: M
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+            - refId: V
+              datasourceUid: __expr__
+              model:
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: $RA / ($RB + ($RB == 0))
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: V
+                type: math
+          noDataState: NoData
+          execErrState: Error
+          for: 10m
+          annotations:
+            description: |-
+                Free disk {{ $values.RA.Value }} bytes is below twice the configured low watermark {{ $values.RB.Value }} bytes. Relative headroom heuristic; tune to disk size and growth.
+                {{ if $labels.job }}
+                job: {{ $labels.job }}{{ end }}{{ if $labels.projectid }}
+                projectid: {{ $labels.projectid }}{{ end }}{{ if $labels.domain }}
+                domain: {{ $labels.domain }}{{ end }}{{ if $labels.environment }}
+                environment: {{ $labels.environment }}{{ end }}{{ if $labels.platform }}
+                platform: {{ $labels.platform }}{{ end }}{{ if $labels.instance }}
+                instance: {{ $labels.instance }}{{ end }}{{ if $labels.cluster }}
+                cluster: {{ $labels.cluster }}{{ end }}{{ if $labels.k8s_cluster_name }}
+                k8s_cluster_name: {{ $labels.k8s_cluster_name }}{{ end }}{{ if $labels.prometheus }}
+                prometheus: {{ $labels.prometheus }}{{ end }}
+                Evaluation interval: 60s
+                Pending period: 10m
+                Observed: free disk={{ $values.RA.Value }} B, watermark={{ $values.RB.Value }} B; threshold <2x watermark
+            summary: 'RabbitMQ low disk headroom: free space={{ printf "%.0f" $values.RA.Value }} bytes, {{ printf "%.2f" $values.V.Value }}x the disk watermark (threshold <2x for 10m).{{ if $labels.projectid }} | project={{ $labels.projectid }}{{ end }}{{ if $labels.environment }} | env={{ $labels.environment }}{{ end }}{{ if $labels.domain }} | domain={{ $labels.domain }}{{ end }}{{ if $labels.instance }} | instance={{ $labels.instance }}{{ end }}'
+          labels:
+            alert_scope: node
+            category: resource-capacity
+            service: rabbitmq
+            severity: warning
+          isPaused: false
+          notification_settings:
+            receiver: OnCall

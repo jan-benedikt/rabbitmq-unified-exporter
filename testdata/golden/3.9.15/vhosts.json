@@ -1,0 +1,9 @@
+[
+  {
+    "name": "/",
+    "cluster_state": {
+      "rabbit@n1": "running",
+      "rabbit@n2": "running"
+    }
+  }
+]

@@ -1,0 +1,126 @@
+{{- if .Values.vmServiceScrape.enabled }}
+{{- $cfg := dict }}
+{{- if kindIs "string" .Values.config }}
+  {{- $cfg = .Values.config | fromYaml }}
+{{- else if .Values.config }}
+  {{- $cfg = .Values.config }}
+{{- end }}
+{{- $splitTarget := true }}
+{{- if hasKey .Values.vmServiceScrape "splitByTarget" }}
+  {{- $splitTarget = .Values.vmServiceScrape.splitByTarget }}
+{{- else if hasKey .Values.serviceMonitor "splitByTarget" }}
+  {{- $splitTarget = .Values.serviceMonitor.splitByTarget }}
+{{- end }}
+{{- $splitSource := true }}
+{{- if hasKey .Values.vmServiceScrape "splitBySource" }}
+  {{- $splitSource = .Values.vmServiceScrape.splitBySource }}
+{{- else if hasKey .Values.serviceMonitor "splitBySource" }}
+  {{- $splitSource = .Values.serviceMonitor.splitBySource }}
+{{- end }}
+{{- $scrapeSelf := true }}
+{{- if hasKey .Values.vmServiceScrape "scrapeSelf" }}
+  {{- $scrapeSelf = .Values.vmServiceScrape.scrapeSelf }}
+{{- else if hasKey .Values.serviceMonitor "scrapeSelf" }}
+  {{- $scrapeSelf = .Values.serviceMonitor.scrapeSelf }}
+{{- end }}
+{{- $includeAggregate := false }}
+{{- if hasKey .Values.vmServiceScrape "includeAggregate" }}
+  {{- $includeAggregate = .Values.vmServiceScrape.includeAggregate }}
+{{- else if hasKey .Values.serviceMonitor "includeAggregate" }}
+  {{- $includeAggregate = .Values.serviceMonitor.includeAggregate }}
+{{- end }}
+{{- $vmScrape := merge (dict) .Values.vmServiceScrape }}
+{{- $_ := set $vmScrape "interval" (.Values.vmServiceScrape.interval | default .Values.serviceMonitor.interval) }}
+{{- $_ := set $vmScrape "scrapeTimeout" (.Values.vmServiceScrape.scrapeTimeout | default .Values.serviceMonitor.scrapeTimeout) }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: {{ include "rabbitmq-unified-exporter.fullname" . }}
+  labels:
+    {{- include "rabbitmq-unified-exporter.labels" . | nindent 4 }}
+    {{- with .Values.vmServiceScrape.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "rabbitmq-unified-exporter.selectorLabels" . | nindent 6 }}
+  endpoints:
+    {{- if or (not $splitTarget) $includeAggregate }}
+    - port: http
+      path: /metrics
+      {{- include "rabbitmq-unified-exporter.vmScrapeOpts" $vmScrape | nindent 6 }}
+      {{- with $vmScrape.relabelings }}
+      relabelConfigs:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+    {{- if and $splitTarget $scrapeSelf }}
+    - port: http
+      path: /metrics/self
+      {{- include "rabbitmq-unified-exporter.vmScrapeOpts" $vmScrape | nindent 6 }}
+      relabelConfigs:
+        - targetLabel: exporter_source
+          replacement: self
+          action: replace
+        {{- with $vmScrape.relabelings }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    {{- end }}
+    {{- if $splitTarget }}
+    {{- range $group := $cfg.groups | default list }}
+    {{- $groupName := required "config.groups[].name is required" $group.name }}
+    {{- $groupLabels := $group.labels | default dict }}
+    {{- range $target := $group.targets | default list }}
+    {{- $targetName := required (printf "config.groups[%s].targets[].name is required" $groupName) $target.name }}
+    {{- $mergedLabels := merge (dict) $groupLabels ($target.labels | default dict) }}
+    {{- if not (index $mergedLabels "job") }}
+      {{- $_ := set $mergedLabels "job" (printf "rabbitmq-%s-metrics" $groupName) }}
+    {{- end }}
+    {{- if not (index $mergedLabels "instance") }}
+      {{- $_ := set $mergedLabels "instance" $targetName }}
+    {{- end }}
+    {{- $sources := list }}
+    {{- if $splitSource }}
+      {{- $sources = append $sources (dict "suffix" "/prometheus" "source" "prometheus") }}
+      {{- $mgmtEnabled := dig "management" "enabled" false $group }}
+      {{- if hasKey ($target | default dict) "management" }}
+        {{- $mgmtEnabled = dig "management" "enabled" $mgmtEnabled $target }}
+      {{- end }}
+      {{- if $mgmtEnabled }}
+        {{- $sources = append $sources (dict "suffix" "/management" "source" "management") }}
+      {{- end }}
+      {{- $probes := $group.probes | default dict }}
+      {{- if hasKey ($target | default dict) "probes" }}
+        {{- $probes = $target.probes | default $probes }}
+      {{- end }}
+      {{- if or (dig "amqp_tcp" "enabled" false $probes) (dig "amqp_auth" "enabled" false $probes) (dig "delivery_test" "enabled" false $probes) }}
+        {{- $sources = append $sources (dict "suffix" "/probes" "source" "probes") }}
+      {{- end }}
+    {{- else }}
+      {{- $sources = append $sources (dict "suffix" "" "source" "target") }}
+    {{- end }}
+    {{- range $src := $sources }}
+    - port: http
+      path: /metrics/targets/{{ $groupName }}/{{ $targetName }}{{ $src.suffix }}
+      {{- include "rabbitmq-unified-exporter.vmScrapeOpts" $vmScrape | nindent 6 }}
+      relabelConfigs:
+        - targetLabel: exporter_source
+          replacement: {{ $src.source | quote }}
+          action: replace
+        - sourceLabels: [__metrics_path__]
+          targetLabel: exporter_metrics_path
+          action: replace
+        {{- range $k, $v := $mergedLabels }}
+        - targetLabel: {{ $k | quote }}
+          replacement: {{ $v | quote }}
+          action: replace
+        {{- end }}
+        {{- with $vmScrape.relabelings }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+{{- end }}
