@@ -52,4 +52,9 @@ jobs:
       - name: Helm lint
         run: helm lint deploy/helm/rabbitmq-unified-exporter
       - name: Helm template
-        run: helm template test deploy/helm/rabbitmq-unified-exporter --set serviceMonitor.enabled=true --set networkPolicy.enabled=true > /tmp/manifests.yaml
+        run: >
+          helm template test deploy/helm/rabbitmq-unified-exporter
+          --set serviceMonitor.enabled=true
+          --set networkPolicy.enabled=true
+          --set 'networkPolicy.brokerCIDRs={10.0.0.0/8}'
+          > /tmp/manifests.yaml
