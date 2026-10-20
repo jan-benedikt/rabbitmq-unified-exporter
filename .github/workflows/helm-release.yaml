@@ -21,6 +21,23 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      # chart-releaser requires origin/gh-pages to exist before the first publish.
+      - name: Bootstrap gh-pages branch
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            echo "origin/gh-pages already exists"
+            git fetch origin gh-pages:gh-pages
+          else
+            echo "Creating empty gh-pages branch"
+            current="$(git rev-parse HEAD)"
+            git checkout --orphan gh-pages
+            git rm -rf --ignore-unmatch . >/dev/null 2>&1 || true
+            git commit --allow-empty -m "Initialize gh-pages for Helm chart index"
+            git push origin gh-pages
+            git checkout --force "$current"
+            git fetch origin gh-pages:gh-pages
+          fi
+
       - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
         with:
           version: v3.14.0
@@ -36,5 +53,6 @@ jobs:
         uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f # v1.7.0
         with:
           charts_dir: deploy/helm
+          skip_existing: true
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
